@@ -4,4 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-rocket = "0.5.1"
+async-graphql = { version = "7.0.17", features = ["chrono"] }
+async-graphql-rocket = "7.0.17"
+rocket = { version = "0.5.1", features = ["json"] }
+serde = { version = "1.0.219", features = ["derive"] }
+tokio = { version = "1.45.1", features = ["full"] }
+sqlx = { version = "0.8.6", features = ["runtime-tokio", "sqlite", "chrono", "macros"] }
+chrono = { version = "0.4.41", features = ["serde"] }
+dotenvy = "0.15.7"
+log = "0.4.27"
+env_logger = "0.11.8"

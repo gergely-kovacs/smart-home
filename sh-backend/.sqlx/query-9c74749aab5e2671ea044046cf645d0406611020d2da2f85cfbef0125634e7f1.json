@@ -1,0 +1,62 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT id, device_id, setpoint_type as \"setpoint_type: SetpointType\", value, unit as \"unit: SetpointUnit\", timestamp as \"timestamp!: DateTime<Utc>\", created_at as \"created_at!: DateTime<Utc>\", updated_at as \"updated_at!: DateTime<Utc>\"\n            FROM ControlSetpoint\n            WHERE device_id = ?\n            ORDER BY timestamp DESC\n            LIMIT 1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "device_id",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "setpoint_type: SetpointType",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "value",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "unit: SetpointUnit",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "timestamp!: DateTime<Utc>",
+        "ordinal": 5,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "created_at!: DateTime<Utc>",
+        "ordinal": 6,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "updated_at!: DateTime<Utc>",
+        "ordinal": 7,
+        "type_info": "Datetime"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "9c74749aab5e2671ea044046cf645d0406611020d2da2f85cfbef0125634e7f1"
+}

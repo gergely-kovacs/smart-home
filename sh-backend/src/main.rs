@@ -25,9 +25,9 @@ async fn graphql_request(schema: &State<AppSchema>, request: GraphQLRequest) -> 
 
 #[rocket::launch]
 async fn rocket() -> _ {
-    env_logger::init();
-
     dotenvy::dotenv().ok();
+
+    env_logger::init();
 
     let database_url =
         std::env::var("DATABASE_URL").expect("DATABASE_URL environment variable is not set");

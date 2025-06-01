@@ -1,20 +1,14 @@
+import { ChakraProvider } from "@chakra-ui/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
-import { ChakraProvider } from "@chakra-ui/react";
-// Import the generated route tree
-import { routeTree } from "./routeTree.gen";
-import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
-
-const client = new ApolloClient({
-  uri: "http://localhost:8000/graphql",
-  cache: new InMemoryCache(),
-});
-
-import "./styles.css";
 import reportWebVitals from "./reportWebVitals.ts";
+import { routeTree } from "./routeTree.gen";
+import "./styles.css";
 
-// Create a new router instance
+const queryClient = new QueryClient();
+
 const router = createRouter({
   routeTree,
   context: {},
@@ -24,23 +18,22 @@ const router = createRouter({
   defaultPreloadStaleTime: 0,
 });
 
-// Register the router instance for type safety
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
   }
 }
 
-// Render the app
 const rootElement = document.getElementById("app");
+
 if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
       <ChakraProvider>
-        <ApolloProvider client={client}>
+        <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
-        </ApolloProvider>
+        </QueryClientProvider>
       </ChakraProvider>
     </StrictMode>,
   );

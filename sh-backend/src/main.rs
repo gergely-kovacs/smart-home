@@ -5,7 +5,7 @@ use async_graphql::{EmptySubscription, Schema, http::GraphiQLSource};
 use async_graphql_rocket::{GraphQLQuery, GraphQLRequest, GraphQLResponse};
 use rocket::routes;
 use rocket::{State, response::content};
-use schema::{AppSchema, Mutation, Query};
+use schema::{AppSchema, SiteMutationRoot, SiteQueryRoot};
 use sqlx::sqlite::SqlitePool;
 
 #[rocket::get("/graphiql")]
@@ -44,7 +44,7 @@ async fn rocket() -> _ {
             .expect("Failed to run database migrations");
     }
 
-    let schema = Schema::build(Query, Mutation, EmptySubscription)
+    let schema = Schema::build(SiteQueryRoot, SiteMutationRoot, EmptySubscription)
         .data(pool.clone())
         .finish();
 

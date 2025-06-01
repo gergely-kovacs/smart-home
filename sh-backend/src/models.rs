@@ -30,6 +30,7 @@ pub enum SetpointUnit {
 }
 
 #[derive(SimpleObject, Debug, Clone, FromRow)]
+#[graphql(complex)]
 pub struct Site {
     pub id: i64,
     pub name: String,
@@ -41,6 +42,7 @@ pub struct Site {
 }
 
 #[derive(SimpleObject, Debug, Clone, FromRow)]
+#[graphql(complex)]
 pub struct Room {
     pub id: i64,
     pub site_id: i64,
@@ -52,6 +54,7 @@ pub struct Room {
 }
 
 #[derive(SimpleObject, Debug, Clone, FromRow)]
+#[graphql(complex)]
 pub struct Device {
     pub id: i64,
     pub room_id: i64,

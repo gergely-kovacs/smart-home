@@ -1,4 +1,6 @@
-use async_graphql::{Context, EmptySubscription, FieldError, FieldResult, Object, Schema};
+use async_graphql::{
+    ComplexObject, Context, EmptySubscription, FieldError, FieldResult, Object, Result, Schema,
+};
 use chrono::{DateTime, Utc};
 use sqlx::sqlite::SqlitePool;
 
@@ -7,11 +9,58 @@ use crate::models::{
     SensorReading, SensorReadingInput, SensorUnit, SetpointType, SetpointUnit, Site, SiteInput,
 };
 
-pub struct Query;
+#[ComplexObject]
+impl Site {
+    async fn rooms(&self, ctx: &Context<'_>) -> Result<Vec<Room>> {
+        let pool = ctx.data::<SqlitePool>()?;
+        let rooms = sqlx::query_as::<_, Room>("SELECT * FROM room WHERE site_id = ?")
+            .bind(self.id)
+            .fetch_all(pool)
+            .await?;
+        Ok(rooms)
+    }
+}
+
+#[ComplexObject]
+impl Room {
+    async fn devices(&self, ctx: &Context<'_>) -> Result<Vec<Device>> {
+        let pool = ctx.data::<SqlitePool>()?;
+        let devices = sqlx::query_as::<_, Device>("SELECT * FROM device WHERE room_id = ?")
+            .bind(self.id)
+            .fetch_all(pool)
+            .await?;
+        Ok(devices)
+    }
+}
+
+#[ComplexObject]
+impl Device {
+    async fn sensor_readings(&self, ctx: &Context<'_>) -> Result<Vec<SensorReading>> {
+        let pool = ctx.data::<SqlitePool>()?;
+        let readings =
+            sqlx::query_as::<_, SensorReading>("SELECT * FROM sensor_reading WHERE device_id = ?")
+                .bind(self.id)
+                .fetch_all(pool)
+                .await?;
+        Ok(readings)
+    }
+
+    async fn control_setpoints(&self, ctx: &Context<'_>) -> Result<Vec<ControlSetpoint>> {
+        let pool = ctx.data::<SqlitePool>()?;
+        let setpoints = sqlx::query_as::<_, ControlSetpoint>(
+            "SELECT * FROM control_setpoint WHERE device_id = ?",
+        )
+        .bind(self.id)
+        .fetch_all(pool)
+        .await?;
+        Ok(setpoints)
+    }
+}
+
+pub struct SiteQueryRoot;
 
 #[Object]
-impl Query {
-    // Example: Fetch all sites
+impl SiteQueryRoot {
     async fn sites(&self, ctx: &Context<'_>) -> FieldResult<Vec<Site>> {
         let pool = ctx.data::<SqlitePool>()?;
         let sites = sqlx::query_as!(
@@ -26,7 +75,15 @@ impl Query {
         Ok(sites)
     }
 
-    // Example: Fetch a single room by ID
+    async fn site(&self, ctx: &Context<'_>, id: i64) -> Result<Option<Site>> {
+        let pool = ctx.data::<SqlitePool>()?;
+        let site = sqlx::query_as::<_, Site>("SELECT * FROM site WHERE id = ?")
+            .bind(id)
+            .fetch_optional(pool)
+            .await?;
+        Ok(site)
+    }
+
     async fn room(&self, ctx: &Context<'_>, id: i64) -> FieldResult<Option<Room>> {
         let pool = ctx.data::<SqlitePool>()?;
         let room = sqlx::query_as!(
@@ -43,7 +100,6 @@ impl Query {
         Ok(room)
     }
 
-    // Example: Fetch all devices in a room
     async fn devices_in_room(&self, ctx: &Context<'_>, room_id: i64) -> FieldResult<Vec<Device>> {
         let pool = ctx.data::<SqlitePool>()?;
         let devices = sqlx::query_as!(
@@ -60,7 +116,6 @@ impl Query {
         Ok(devices)
     }
 
-    // Example: Fetch latest sensor reading for a device
     async fn latest_sensor_reading(
         &self,
         ctx: &Context<'_>,
@@ -83,7 +138,6 @@ impl Query {
         Ok(reading)
     }
 
-    // Example: Fetch latest control setpoint for a device
     async fn latest_control_setpoint(
         &self,
         ctx: &Context<'_>,
@@ -107,10 +161,10 @@ impl Query {
     }
 }
 
-pub struct Mutation;
+pub struct SiteMutationRoot;
 
 #[Object]
-impl Mutation {
+impl SiteMutationRoot {
     async fn create_site(&self, ctx: &Context<'_>, input: SiteInput) -> FieldResult<Site> {
         let pool = ctx.data::<SqlitePool>()?;
         let result = sqlx::query_as!(
@@ -231,4 +285,4 @@ impl Mutation {
     }
 }
 
-pub type AppSchema = Schema<Query, Mutation, EmptySubscription>;
+pub type AppSchema = Schema<SiteQueryRoot, SiteMutationRoot, EmptySubscription>;

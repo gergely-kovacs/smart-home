@@ -5,7 +5,9 @@ made with the intent to learn about the tech stack.
 
 ## Setup
 
-### sqlx-cli
+### Prerequisites
+
+#### sqlx-cli
 
 Install sqlx-cli with the following command:
 
@@ -30,7 +32,7 @@ TODO
 
 #### Migrate
 
-Migrations are run automatically in development mode, when starting the server
+Migrations are run automatically in development mode when starting the server,  
 but can be run manually with the following command:
 
 ```bash
@@ -43,8 +45,26 @@ Copy the `sample.env` file and rename it to `.env`.
 
 ## Running
 
-Run the backend with the following command:
+### Simple
+
+If you just want to run the backend, and don't plan on changing anything,  
+run the backend with the following command:
 
 ```bash
 cargo run
+```
+
+### Watch
+
+You can run in watch mode with cargo-watch.  
+To install cargo-watch, run the following command:
+
+```bash
+cargo install cargo-watch
+```
+
+Run the backend in watch mode with the following command:
+
+```bash
+cargo watch -x run
 ```

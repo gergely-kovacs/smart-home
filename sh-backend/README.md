@@ -28,7 +28,11 @@ sqlite3 development.db < migrations/20250531214811_initial_schema.sql
 
 #### Seed
 
-TODO
+To Seed the database, run the following command:
+
+```bash
+cargo run --bin seed_db
+```
 
 #### Migrate
 

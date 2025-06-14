@@ -1,6 +1,4 @@
-use async_graphql::{
-    ComplexObject, Context, EmptySubscription, FieldError, FieldResult, Object, Result, Schema,
-};
+use async_graphql::{Context, EmptySubscription, FieldError, FieldResult, Object, Result, Schema};
 use chrono::{DateTime, Utc};
 use sqlx::sqlite::SqlitePool;
 
@@ -8,54 +6,6 @@ use crate::models::{
     ControlSetpoint, ControlSetpointInput, Device, DeviceInput, DeviceType, Room, RoomInput,
     SensorReading, SensorReadingInput, SensorUnit, SetpointType, SetpointUnit, Site, SiteInput,
 };
-
-#[ComplexObject]
-impl Site {
-    async fn rooms(&self, ctx: &Context<'_>) -> Result<Vec<Room>> {
-        let pool = ctx.data::<SqlitePool>()?;
-        let rooms = sqlx::query_as::<_, Room>("SELECT * FROM room WHERE site_id = ?")
-            .bind(self.id)
-            .fetch_all(pool)
-            .await?;
-        Ok(rooms)
-    }
-}
-
-#[ComplexObject]
-impl Room {
-    async fn devices(&self, ctx: &Context<'_>) -> Result<Vec<Device>> {
-        let pool = ctx.data::<SqlitePool>()?;
-        let devices = sqlx::query_as::<_, Device>("SELECT * FROM device WHERE room_id = ?")
-            .bind(self.id)
-            .fetch_all(pool)
-            .await?;
-        Ok(devices)
-    }
-}
-
-#[ComplexObject]
-impl Device {
-    async fn sensor_readings(&self, ctx: &Context<'_>) -> Result<Vec<SensorReading>> {
-        let pool = ctx.data::<SqlitePool>()?;
-        let readings =
-            sqlx::query_as::<_, SensorReading>("SELECT * FROM sensor_reading WHERE device_id = ?")
-                .bind(self.id)
-                .fetch_all(pool)
-                .await?;
-        Ok(readings)
-    }
-
-    async fn control_setpoints(&self, ctx: &Context<'_>) -> Result<Vec<ControlSetpoint>> {
-        let pool = ctx.data::<SqlitePool>()?;
-        let setpoints = sqlx::query_as::<_, ControlSetpoint>(
-            "SELECT * FROM control_setpoint WHERE device_id = ?",
-        )
-        .bind(self.id)
-        .fetch_all(pool)
-        .await?;
-        Ok(setpoints)
-    }
-}
 
 pub struct SiteQueryRoot;
 
@@ -232,7 +182,7 @@ impl SiteMutationRoot {
             RETURNING id, room_id, name, device_type as "device_type: DeviceType", unique_identifier, created_at as "created_at!: DateTime<Utc>", updated_at as "updated_at!: DateTime<Utc>"
             "#
         )
-        .bind( input.room_id)
+        .bind(input.room_id)
         .bind(input.name)
         .bind(input.device_type as DeviceType)
         .bind(input.unique_identifier)

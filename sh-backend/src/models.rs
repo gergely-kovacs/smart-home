@@ -1,6 +1,7 @@
-use async_graphql::{Enum, InputObject, SimpleObject};
+use async_graphql::{ComplexObject, Context, Enum, InputObject, Result, SimpleObject};
+
 use chrono::{DateTime, Utc};
-use sqlx::FromRow;
+use sqlx::{FromRow, SqlitePool};
 
 #[derive(Enum, Copy, Clone, Eq, PartialEq, Debug, sqlx::Type)]
 #[sqlx(rename_all = "PascalCase")]
@@ -92,6 +93,54 @@ pub struct ControlSetpoint {
     pub created_at: DateTime<Utc>,
     #[graphql(skip)]
     pub updated_at: DateTime<Utc>,
+}
+
+#[ComplexObject]
+impl Site {
+    async fn rooms(&self, ctx: &Context<'_>) -> Result<Vec<Room>> {
+        let pool = ctx.data::<SqlitePool>()?;
+        let rooms = sqlx::query_as::<_, Room>("SELECT * FROM room WHERE site_id = ?")
+            .bind(self.id)
+            .fetch_all(pool)
+            .await?;
+        Ok(rooms)
+    }
+}
+
+#[ComplexObject]
+impl Room {
+    async fn devices(&self, ctx: &Context<'_>) -> Result<Vec<Device>> {
+        let pool = ctx.data::<SqlitePool>()?;
+        let devices = sqlx::query_as::<_, Device>("SELECT * FROM device WHERE room_id = ?")
+            .bind(self.id)
+            .fetch_all(pool)
+            .await?;
+        Ok(devices)
+    }
+}
+
+#[ComplexObject]
+impl Device {
+    async fn sensor_readings(&self, ctx: &Context<'_>) -> Result<Vec<SensorReading>> {
+        let pool = ctx.data::<SqlitePool>()?;
+        let readings =
+            sqlx::query_as::<_, SensorReading>("SELECT * FROM sensor_reading WHERE device_id = ?")
+                .bind(self.id)
+                .fetch_all(pool)
+                .await?;
+        Ok(readings)
+    }
+
+    async fn control_setpoints(&self, ctx: &Context<'_>) -> Result<Vec<ControlSetpoint>> {
+        let pool = ctx.data::<SqlitePool>()?;
+        let setpoints = sqlx::query_as::<_, ControlSetpoint>(
+            "SELECT * FROM control_setpoint WHERE device_id = ?",
+        )
+        .bind(self.id)
+        .fetch_all(pool)
+        .await?;
+        Ok(setpoints)
+    }
 }
 
 #[derive(InputObject, Debug, Clone)]

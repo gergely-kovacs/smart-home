@@ -1,4 +1,5 @@
-import { ChakraProvider } from "@chakra-ui/react";
+import { ColorModeProvider } from "@/providers/ColorMode.tsx";
+import { ChakraProvider, createSystem, defaultConfig } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
@@ -24,16 +25,29 @@ declare module "@tanstack/react-router" {
   }
 }
 
+export const chakraTheme = createSystem(defaultConfig, {
+  theme: {
+    tokens: {
+      fonts: {
+        heading: { value: `'Roboto', sans-serif` },
+        body: { value: `'Roboto', sans-serif` },
+      },
+    },
+  },
+});
+
 const rootElement = document.getElementById("app");
 
 if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <ChakraProvider>
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
-        </QueryClientProvider>
+      <ChakraProvider value={chakraTheme}>
+        <ColorModeProvider>
+          <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
+          </QueryClientProvider>
+        </ColorModeProvider>
       </ChakraProvider>
     </StrictMode>,
   );

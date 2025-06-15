@@ -99,7 +99,7 @@ pub struct ControlSetpoint {
 impl Site {
     async fn rooms(&self, ctx: &Context<'_>) -> Result<Vec<Room>> {
         let pool = ctx.data::<SqlitePool>()?;
-        let rooms = sqlx::query_as::<_, Room>("SELECT * FROM room WHERE site_id = ?")
+        let rooms = sqlx::query_as::<_, Room>("SELECT * FROM Room WHERE site_id = ?")
             .bind(self.id)
             .fetch_all(pool)
             .await?;
@@ -111,7 +111,7 @@ impl Site {
 impl Room {
     async fn devices(&self, ctx: &Context<'_>) -> Result<Vec<Device>> {
         let pool = ctx.data::<SqlitePool>()?;
-        let devices = sqlx::query_as::<_, Device>("SELECT * FROM device WHERE room_id = ?")
+        let devices = sqlx::query_as::<_, Device>("SELECT * FROM Device WHERE room_id = ?")
             .bind(self.id)
             .fetch_all(pool)
             .await?;
@@ -124,7 +124,7 @@ impl Device {
     async fn sensor_readings(&self, ctx: &Context<'_>) -> Result<Vec<SensorReading>> {
         let pool = ctx.data::<SqlitePool>()?;
         let readings =
-            sqlx::query_as::<_, SensorReading>("SELECT * FROM sensor_reading WHERE device_id = ?")
+            sqlx::query_as::<_, SensorReading>("SELECT * FROM SensorReading WHERE device_id = ?")
                 .bind(self.id)
                 .fetch_all(pool)
                 .await?;
@@ -134,7 +134,7 @@ impl Device {
     async fn control_setpoints(&self, ctx: &Context<'_>) -> Result<Vec<ControlSetpoint>> {
         let pool = ctx.data::<SqlitePool>()?;
         let setpoints = sqlx::query_as::<_, ControlSetpoint>(
-            "SELECT * FROM control_setpoint WHERE device_id = ?",
+            "SELECT * FROM ControlSetpoint WHERE device_id = ?",
         )
         .bind(self.id)
         .fetch_all(pool)

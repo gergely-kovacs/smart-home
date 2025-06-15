@@ -18,8 +18,8 @@ pub async fn seed_db(pool: &SqlitePool, _should_extend: bool) -> Result<()> {
     debug!("Starting database seeding...");
 
     let site_input = SiteInput {
-        name: "Main Office Site".to_string(),
-        address: Some("123 Main St, Anytown, USA".to_string()),
+        name: "Nordstan Göteborg".to_string(),
+        address: Some("Götgatan 11, 411 05 Göteborg, Sweden".to_string()),
     };
     let site = sqlx::query_as::<_, Site>(
         r#"
@@ -38,7 +38,7 @@ pub async fn seed_db(pool: &SqlitePool, _should_extend: bool) -> Result<()> {
 
     let room_input = RoomInput {
         site_id: site.id,
-        name: "Server Room".to_string(),
+        name: "Systembolaget Main Room".to_string(),
     };
     let room = sqlx::query_as::<_, Room>(
         r#"
@@ -57,7 +57,7 @@ pub async fn seed_db(pool: &SqlitePool, _should_extend: bool) -> Result<()> {
 
     let device_input = DeviceInput {
         room_id: room.id,
-        name: "Server Room Temperature Sensor".to_string(),
+        name: "Systembolaget Main Temperature Sensor".to_string(),
         device_type: DeviceType::TemperatureSensor,
         unique_identifier: None,
     };
@@ -125,7 +125,7 @@ pub async fn seed_db(pool: &SqlitePool, _should_extend: bool) -> Result<()> {
         .bind(sensor_reading_input.device_id)
         .bind(sensor_reading_input.value)
         .bind(sensor_reading_input.unit as Option<SensorUnit>)
-        .bind(now)
+        .bind(current_timestamp)
         .bind(now)
         .bind(now)
         .fetch_one(&mut *tx)
